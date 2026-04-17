@@ -1,0 +1,72 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "db_source": {
+      "type": "string",
+      "enum": [
+        "oracle",
+        "postgresql",
+        "mysql",
+        "sqlserver",
+        "ddl_file"
+      ],
+      "description": "Database source type"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Detected or selected domain"
+    },
+    "domain_confidence": {
+      "type": "number",
+      "description": "Domain detection confidence 0-100"
+    },
+    "table_count": {
+      "type": "number"
+    },
+    "node_count": {
+      "type": "number"
+    },
+    "edge_count": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "analyzing",
+        "converted",
+        "exported"
+      ],
+      "default": "draft"
+    },
+    "conversion_mode": {
+      "type": "string",
+      "enum": [
+        "erd_to_graph",
+        "graph_to_erd",
+        "bidirectional"
+      ],
+      "default": "erd_to_graph"
+    },
+    "schema_data": {
+      "type": "string",
+      "description": "JSON string of ERD schema"
+    },
+    "graph_data": {
+      "type": "string",
+      "description": "JSON string of graph data"
+    },
+    "settings": {
+      "type": "object",
+      "description": "Project-specific settings"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

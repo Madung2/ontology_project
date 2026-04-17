@@ -1,0 +1,44 @@
+version: "3"
+
+tasks:
+  default:
+    desc: 프론트엔드 + 백엔드 동시 실행
+    deps:
+      - backend
+      - frontend
+
+  backend:
+    desc: Convergence 백엔드 서버 (FastAPI, :8080)
+    dir: convergence
+    cmds:
+      - .venv/bin/python run_server.py
+
+  frontend:
+    desc: Base44 프론트엔드 dev 서버 (Vite)
+    dir: base44
+    cmds:
+      - npm run dev
+
+  install:
+    desc: 프론트엔드 + 백엔드 의존성 설치
+    cmds:
+      - task: install:backend
+      - task: install:frontend
+
+  install:backend:
+    desc: 백엔드 의존성 설치 (uv)
+    dir: convergence
+    cmds:
+      - uv sync
+
+  install:frontend:
+    desc: 프론트엔드 의존성 설치 (npm)
+    dir: base44
+    cmds:
+      - npm install
+
+  test:
+    desc: 백엔드 테스트 실행
+    dir: convergence
+    cmds:
+      - .venv/bin/pytest

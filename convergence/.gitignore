@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# uv
+.python-version
+uv.lock
+
+# Testing
+.pytest_cache/
+pytest-cache-files-*/
+htmlcov/
+.coverage
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Environment & secrets
+.env
+.env.*
+credentials.json
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db

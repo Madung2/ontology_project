@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convergence Module</title>
+    <style>
+        :root {
+            --bg: #101214;
+            --surface: #181c20;
+            --surface-2: #20262b;
+            --surface-3: #263039;
+            --line: #333b43;
+            --text: #edf2f4;
+            --muted: #9aa5ad;
+            --accent: #16c8a3;
+            --accent-2: #e8b04f;
+            --accent-3: #58a6ff;
+            --accent-4: #ff7aa8;
+            --danger: #ef6f6c;
+            --violet: #b082d8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                linear-gradient(135deg, rgba(22, 200, 163, 0.07), transparent 28%),
+                linear-gradient(315deg, rgba(232, 176, 79, 0.06), transparent 26%),
+                var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            letter-spacing: 0;
+        }
+
+        #app {
+            min-height: 100vh;
+        }
+
+        .boot {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #151a1e, #111416);
+            border-right: 1px solid var(--line);
+            padding: 20px 12px;
+            overflow: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 24px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 16px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border: 2px solid var(--accent);
+            background: rgba(22, 200, 163, 0.12);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        .nav a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 11px 12px;
+            border-radius: 6px;
+            display: block;
+            border-left: 3px solid transparent;
+            transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+        }
+
+        .nav a.active,
+        .nav a:hover {
+            background: var(--surface-2);
+            color: var(--text);
+            border-left-color: var(--accent);
+        }
+
+        .content {
+            min-width: 0;
+            max-height: 100vh;
+            overflow: auto;
+            padding: 34px;
+        }
+
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            color: var(--accent);
+            font-size: 15px;
+            text-transform: uppercase;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .grid.two {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid.four {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .card,
+        .panel,
+        .notice,
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .card {
+            padding: 18px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+                var(--surface);
+            position: relative;
+        }
+
+        .card::before {
+            content: "";
+            display: block;
+            height: 3px;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            opacity: 0.72;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .clickable:hover {
+            border-color: var(--accent);
+        }
+
+        .card-title {
+            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row.between {
+            justify-content: space-between;
+        }
+
+        .stack {
+            display: grid;
+            gap: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 14px;
+            cursor: pointer;
+            background: var(--surface-3);
+            color: var(--text);
+            min-height: 38px;
+        }
+
+        .btn:hover {
+            filter: brightness(1.12);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: #07110f;
+            font-weight: 700;
+        }
+
+        .btn.sun {
+            background: var(--accent-2);
+            color: #16110a;
+            font-weight: 700;
+        }
+
+        .btn.small {
+            padding: 7px 10px;
+            min-height: 32px;
+            font-size: 13px;
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: rgba(22, 200, 163, 0.16);
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        .badge.lookup,
+        .badge.skip,
+        .badge.draft {
+            background: rgba(154, 165, 173, 0.18);
+            color: var(--muted);
+        }
+
+        .badge.junction,
+        .badge.edge {
+            background: rgba(232, 176, 79, 0.18);
+            color: var(--accent-2);
+        }
+
+        .badge.audit,
+        .badge.error {
+            background: rgba(239, 111, 108, 0.16);
+            color: var(--danger);
+        }
+
+        .badge.slm,
+        .badge.fibo {
+            background: rgba(176, 130, 216, 0.18);
+            color: var(--violet);
+        }
+
+        .badge.blue {
+            background: rgba(88, 166, 255, 0.18);
+            color: var(--accent-3);
+        }
+
+        .notice {
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            color: var(--muted);
+        }
+
+        .notice strong {
+            color: var(--text);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            color: var(--text);
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+
+        textarea {
+            min-height: 170px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+            padding: 11px 10px;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.8fr) minmax(420px, 1.2fr);
+            gap: 14px;
+            height: calc(100vh - 190px);
+            min-height: 520px;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .panel-head {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            min-height: 0;
+            overflow: auto;
+            padding: 12px;
+        }
+
+        .table-item {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            background: #14181c;
+        }
+
+        .table-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 12px;
+            cursor: pointer;
+            background: var(--surface);
+        }
+
+        .columns {
+            padding: 8px 12px;
+        }
+
+        .column {
+            display: grid;
+            grid-template-columns: 24px minmax(0, 1fr) auto;
+            gap: 8px;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .column:last-child {
+            border-bottom: 0;
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        .stat {
+            padding: 16px;
+            text-align: center;
+            background:
+                linear-gradient(180deg, rgba(22, 200, 163, 0.08), rgba(232, 176, 79, 0.04)),
+                var(--surface);
+        }
+
+        .stat strong {
+            display: block;
+            color: var(--accent);
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .graph {
+            width: 100%;
+            height: 100%;
+            min-height: 430px;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                #14181c;
+            background-size: 36px 36px;
+            border-radius: 6px;
+            touch-action: none;
+        }
+
+        .graph text {
+            fill: var(--text);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .graph .sub {
+            fill: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .graph .edge {
+            stroke: #57636d;
+            stroke-width: 2;
+        }
+
+        .graph .edge-label {
+            fill: var(--accent-2);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .graph-node {
+            cursor: grab;
+        }
+
+        .graph-node:active {
+            cursor: grabbing;
+        }
+
+        .graph-node circle {
+            transition: stroke-width 0.16s ease, filter 0.16s ease;
+        }
+
+        .graph-node:hover circle {
+            stroke-width: 3;
+            filter: drop-shadow(0 0 8px rgba(22, 200, 163, 0.42));
+        }
+
+        .graph-help {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 0 0 10px;
+        }
+
+        .code {
+            display: block;
+            white-space: pre;
+            overflow: auto;
+            padding: 16px;
+            min-height: 420px;
+            background: #0c0f11;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: #e7edf0;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            border: 1px solid rgba(22, 200, 163, 0.45);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 6px 9px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 980px) {
+            .layout,
+            .workspace,
+            .grid.two,
+            .grid.three,
+            .grid.four {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                max-height: none;
+                padding: 22px;
+            }
+
+            .sidebar {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="boot">
+            <div>
+                <strong>Convergence Module</strong>
+                <p>로컬 UI를 준비하고 있습니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "/api";
+        const app = document.getElementById("app");
+
+        const state = {
+            route: getRoute(),
+            busy: false,
+            message: "",
+            projects: [],
+            currentProject: null,
+            schema: null,
+            domain: null,
+            classification: null,
+            semantic: null,
+            trace: null,
+            expanded: {},
+            selectedNode: "",
+            exportFormat: "cypher",
+            exportCode: "",
+            graphPositions: {},
+            slm: null,
+        };
+
+        const demoTables = [
+            {
+                name: "customers",
+                classification: "ENTITY",
+                graph_role: "NODE",
+                confidence: 0.95,
+                columns: [
+                    { name: "customer_id", data_type: "integer", is_pk: true },
+                    { name: "first_name", data_type: "varchar" },
+                    { name: "last_name", data_type: "varchar" },
+                    { name: "email", data_type: "varchar" },
+                    { name: "phone", data_type: "varchar" },
+                ],
+            },
+            {
+                name: "accounts",
+                classification: "ENTITY",
+                graph_role: "NODE",
+                confidence: 0.92,
+                columns: [
+                    { name: "account_id", data_type: "integer", is_pk: true },
+                    { name: "customer_id", data_type: "integer", is_fk: true },
+                    { name: "balance", data_type: "decimal" },
+                    { name: "currency", data_type: "varchar" },
+                    { name: "status", data_type: "varchar" },
+                ],
+            },
+            {
+                name: "transactions",
+                classification: "ENTITY",
+                graph_role: "NODE",
+                confidence: 0.88,
+                columns: [
+                    { name: "txn_id", data_type: "integer", is_pk: true },
+                    { name: "from_account_id", data_type: "integer", is_fk: true },
+                    { name: "to_account_id", data_type: "integer", is_fk: true },
+                    { name: "amount", data_type: "decimal" },
+                    { name: "txn_date", data_type: "timestamp" },
+                ],
+            },
+            {
+                name: "customer_branch",
+                classification: "JUNCTION",
+                graph_role: "EDGE",
+                confidence: 0.95,
+                columns: [
+                    { name: "customer_id", data_type: "integer", is_pk: true, is_fk: true },
+                    { name: "branch_id", data_type: "integer", is_pk: true, is_fk: true },
+                    { name: "relationship_type", data_type: "varchar" },
+                ],
+            },
+        ];
+
+        const demoSemantic = {
+            nodes: [
+                { id: "Customer", label: "Customer", source_table: "customers", properties: [{ name: "email", data_type: "varchar" }] },
+                { id: "Account", label: "Account", source_table: "accounts", properties: [{ name: "balance", data_type: "decimal" }] },
+                { id: "Transaction", label: "Transaction", source_table: "transactions", properties: [{ name: "amount", data_type: "decimal" }] },
+                { id: "Branch", label: "Branch", source_table: "branches", properties: [{ name: "branch_name", data_type: "varchar" }] },
+            ],
+            edges: [
+                { id: "edge_1", edge_type: "Account_OWNS_Customer", from_node: "Account", to_node: "Customer", cardinality: "1:N" },
+                { id: "edge_2", edge_type: "Transaction_HAS_Account", from_node: "Transaction", to_node: "Account", cardinality: "1:N" },
+                { id: "junction_edge_customer_branch", edge_type: "customers_branches", from_node: "Customer", to_node: "Branch", cardinality: "M:N" },
+            ],
+            stats: { nodes: 4, edges: 3, trace_links: 7, node_properties: 4, edge_properties: 1 },
+            domain_mappings: { customers: "FIBO:Customer", accounts: "FIBO:Account" },
+        };
+
+        function getRoute() {
+            return location.hash.replace(/^#/, "") || "/";
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function escapeSelector(value) {
+            if (window.CSS && CSS.escape) {
+                return CSS.escape(value);
+            }
+            return String(value ?? "").replace(/["\\]/g, "\\$&");
+        }
+
+        async function api(path, options = {}) {
+            const response = await fetch(API_BASE + path, options);
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || response.statusText);
+            }
+            return response.json();
+        }
+
+        async function withBusy(fn) {
+            state.busy = true;
+            state.message = "";
+            render();
+            try {
+                await fn();
+            } catch (error) {
+                state.message = error.message || String(error);
+            } finally {
+                state.busy = false;
+                render();
+            }
+        }
+
+        async function refreshProjects() {
+            try {
+                state.projects = await api("/projects");
+            } catch (error) {
+                state.projects = [];
+            }
+        }
+
+        async function loadProject(projectId) {
+            const [schema, domain, classification, semantic, trace] = await Promise.all([
+                api(`/projects/${projectId}/schema`),
+                api(`/projects/${projectId}/domain`),
+                api(`/projects/${projectId}/classification`),
+                api(`/projects/${projectId}/semantic-ir`),
+                api(`/projects/${projectId}/trace`),
+            ]);
+            state.schema = schema;
+            state.domain = domain;
+            state.classification = classification;
+            state.semantic = semantic;
+            state.trace = trace;
+            state.exportCode = "";
+            state.graphPositions = {};
+            if (!state.selectedNode && semantic.nodes.length > 0) {
+                state.selectedNode = semantic.nodes[0].id;
+            }
+        }
+
+        async function createBankingSample() {
+            await withBusy(async () => {
+                const project = await api("/projects", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: "은행 코어 스키마",
+                        description: "banking sample",
+                    }),
+                });
+                state.currentProject = project;
+                await api(`/projects/${project.id}/load-sample?sample_name=banking`, {
+                    method: "POST",
+                });
+                await loadProject(project.id);
+                location.hash = "#/workspace";
+            });
+        }
+
+        async function uploadDdl(file) {
+            await withBusy(async () => {
+                const project = await api("/projects", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: file.name.replace(/\.[^.]+$/, "") || "DDL Project",
+                        description: "uploaded DDL",
+                    }),
+                });
+                const form = new FormData();
+                form.append("file", file);
+                await api(`/projects/${project.id}/upload-ddl`, {
+                    method: "POST",
+                    body: form,
+                });
+                state.currentProject = project;
+                await loadProject(project.id);
+                location.hash = "#/workspace";
+            });
+        }
+
+        async function connectDatabase() {
+            const name = document.getElementById("db-project-name")?.value?.trim() || "라이브 DB 스키마";
+            const connectionUrl = document.getElementById("db-url")?.value?.trim();
+            const schemaName = document.getElementById("db-schema")?.value?.trim();
+            const includeViews = Boolean(document.getElementById("db-include-views")?.checked);
+
+            if (!connectionUrl) {
+                state.message = "DB 연결 URL을 입력하세요.";
+                render();
+                return;
+            }
+
+            await withBusy(async () => {
+                const project = await api("/projects", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name,
+                        description: "live database",
+                    }),
+                });
+
+                await api(`/projects/${project.id}/connect-db`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        connection_url: connectionUrl,
+                        schema_name: schemaName || null,
+                        include_views: includeViews,
+                    }),
+                });
+
+                state.currentProject = project;
+                await loadProject(project.id);
+                location.hash = "#/workspace";
+            });
+        }
+
+        function navLink(path, label) {
+            const active = state.route === path ? "active" : "";
+            return `<a class="${active}" href="#${path}">${label}</a>`;
+        }
+
+        function layout(content) {
+            return `
+                <div class="layout">
+                    <aside class="sidebar">
+                        <div class="brand">
+                            <div class="brand-mark">C</div>
+                            <div>
+                                <div class="brand-title">Convergence</div>
+                                <div class="meta">ERD → 의미 그래프</div>
+                            </div>
+                        </div>
+                        <nav class="nav">
+                            ${navLink("/", "🏠 대시보드")}
+                            ${navLink("/datasource", "🧩 데이터 소스")}
+                            ${navLink("/workspace", "🛠️ 작업 공간")}
+                            ${navLink("/domain", "🎯 도메인 감지")}
+                            ${navLink("/classification", "🏷️ 테이블 분류")}
+                            ${navLink("/semantic-ir", "🧠 의미 IR")}
+                            ${navLink("/trace", "🔎 추적 맵")}
+                            ${navLink("/export", "📦 내보내기")}
+                            ${navLink("/settings", "⚙️ 설정")}
+                        </nav>
+                    </aside>
+                    <main class="content">
+                        ${state.message ? `<div class="notice"><strong>처리 실패</strong><br>${escapeHtml(state.message)}</div>` : ""}
+                        ${state.busy ? `<div class="notice"><strong>✨ 파이프라인 실행 중</strong><br>DDL/DB 메타데이터 추출, 도메인 감지, 테이블 분류, 의미 IR 생성을 진행하고 있습니다.</div>` : ""}
+                        ${content}
+                    </main>
+                </div>
+            `;
+        }
+
+        function statValue(key) {
+            return state.semantic?.stats?.[key] ?? demoSemantic.stats[key] ?? 0;
+        }
+
+        function currentTables() {
+            if (!state.schema?.tables) {
+                return demoTables;
+            }
+            const classMap = new Map((state.classification || []).map((item) => [item.table_name, item]));
+            return state.schema.tables.map((table) => {
+                const cls = classMap.get(table.name) || {};
+                return {
+                    ...table,
+                    classification: cls.classification || "UNKNOWN",
+                    graph_role: cls.graph_role || "NODE",
+                    confidence: cls.confidence ?? 0.5,
+                };
+            });
+        }
+
+        function pageTitle(title, subtitle, actions = "") {
+            return `
+                <div class="page-head">
+                    <div>
+                        <h1>${title}</h1>
+                        <p>${subtitle}</p>
+                    </div>
+                    <div class="actions">${actions}</div>
+                </div>
+            `;
+        }
+
+        function renderDashboard() {
+            const projectCards = state.projects.length
+                ? state.projects.map((project) => `
+                    <div class="card clickable" data-open-project="${escapeHtml(project.id)}">
+                        <div class="row between">
+                            <div>
+                                <div class="card-title">${escapeHtml(project.name)}</div>
+                                <div class="meta">${escapeHtml(project.domain || "draft")}</div>
+                            </div>
+                            <span class="badge ${escapeHtml(project.status)}">${escapeHtml(project.status)}</span>
+                        </div>
+                        <div class="meta" style="margin-top:12px">
+                            ${project.stats?.tables || 0}개 테이블, ${project.stats?.nodes || 0}개 노드, ${project.stats?.edges || 0}개 관계
+                        </div>
+                    </div>
+                `).join("")
+                : `
+                    <div class="card">
+                        <div class="card-title">아직 열린 프로젝트가 없습니다.</div>
+                        <div class="meta">은행 샘플을 실행하거나 DDL 파일을 업로드해 변환을 시작하세요.</div>
+                    </div>
+                `;
+
+            return pageTitle(
+                "🏠 대시보드",
+                "RDB 스키마를 의미 IR 중심의 그래프 스키마로 변환합니다.",
+                `<button class="btn primary" data-action="sample">🏦 은행 샘플 실행</button>
+                 <a class="btn" href="#/datasource">DDL 업로드</a>`
+            ) + `
+                <section class="grid four" style="margin-bottom:22px">
+                    <div class="stat"><strong>${state.schema?.tables?.length || 0}</strong><span class="meta">테이블</span></div>
+                    <div class="stat"><strong>${statValue("nodes")}</strong><span class="meta">노드</span></div>
+                    <div class="stat"><strong>${statValue("edges")}</strong><span class="meta">관계</span></div>
+                    <div class="stat"><strong>${escapeHtml(state.domain?.name || "ready")}</strong><span class="meta">도메인</span></div>
+                </section>
+                <section class="grid">
+                    <h2>📂 최근 프로젝트</h2>
+                    <div class="grid three">${projectCards}</div>
+                </section>
+                <section class="grid two" style="margin-top:24px">
+                    <div class="card clickable" data-action="sample">
+                        <div class="card-title">🏦 은행 코어 스키마</div>
+                        <div class="meta">로컬 fixture 기반으로 DDL 파싱, finance 도메인 감지, 의미 IR 변환을 한 번에 실행합니다.</div>
+                    </div>
+                    <div class="card clickable" data-nav="/datasource">
+                        <div class="card-title">📝 내 DDL 변환</div>
+                        <div class="meta">.sql 파일을 업로드해 현재 파이프라인으로 바로 변환합니다.</div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderDataSource() {
+            return pageTitle("🧩 데이터 소스 연결", "DDL 파일 업로드 또는 실제 DB 직접 연결로 변환을 시작합니다.") + `
+                <div class="grid two">
+                    <div class="card">
+                        <div class="card-title">📄 DDL 파일 업로드</div>
+                        <p style="margin-bottom:14px">PostgreSQL, Oracle, MySQL 계열 CREATE TABLE DDL을 업로드하세요.</p>
+                        <input id="ddl-file" type="file" accept=".sql,.ddl,text/plain">
+                        <div class="actions" style="margin-top:14px">
+                            <button class="btn primary" data-action="upload">업로드 후 변환</button>
+                            <button class="btn sun" data-action="sample">은행 샘플 실행</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🔌 DB 직접 연결</div>
+                        <p style="margin-bottom:14px">SQLAlchemy reflection으로 실제 DB의 테이블, 컬럼, PK/FK, 인덱스를 읽어 바로 변환합니다.</p>
+                        <label>프로젝트 이름</label>
+                        <input id="db-project-name" type="text" value="라이브 DB 스키마" style="margin-bottom:12px">
+                        <label>DB 연결 URL</label>
+                        <input id="db-url" type="text" placeholder="sqlite:////absolute/path/app.db">
+                        <div class="meta" style="margin-top:8px;margin-bottom:12px">
+                            예: postgresql+psycopg://user:pass@localhost:5432/db · mysql+pymysql://user:pass@localhost/db · oracle+oracledb://user:pass@host:1521/?service_name=XEPDB1
+                        </div>
+                        <label>스키마 / Owner 선택</label>
+                        <input id="db-schema" type="text" placeholder="public, HR, dbo 등" style="margin-bottom:12px">
+                        <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:13px">
+                            <input id="db-include-views" type="checkbox" style="width:auto">
+                            View도 테이블처럼 포함
+                        </label>
+                        <button class="btn primary" data-action="connect-db" style="margin-top:14px">연결 후 변환</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWorkspace() {
+            const tables = currentTables();
+            const columns = tables.reduce((sum, table) => sum + (table.columns?.length || 0), 0);
+            const tableList = tables.map((table) => {
+                const open = state.expanded[table.name] ?? tables.indexOf(table) < 2;
+                const columnsHtml = open ? `
+                    <div class="columns">
+                        ${(table.columns || []).map((col) => `
+                            <div class="column">
+                                <span class="muted">${col.is_pk ? "PK" : col.is_fk ? "FK" : ""}</span>
+                                <span class="mono">${escapeHtml(col.name)}</span>
+                                <span class="muted mono">${escapeHtml(col.data_type)}</span>
+                            </div>
+                        `).join("")}
+                    </div>
+                ` : "";
+                return `
+                    <div class="table-item">
+                        <div class="table-top" data-toggle-table="${escapeHtml(table.name)}">
+                            <div class="row">
+                                <span class="mono">${escapeHtml(table.name)}</span>
+                                <span class="badge ${escapeHtml(String(table.classification).toLowerCase())}">${escapeHtml(table.classification)}</span>
+                                <span class="badge ${escapeHtml(String(table.graph_role).toLowerCase())}">${escapeHtml(table.graph_role)}</span>
+                            </div>
+                            <span class="muted">${table.columns?.length || 0} cols</span>
+                        </div>
+                        ${columnsHtml}
+                    </div>
+                `;
+            }).join("");
+
+            return pageTitle(
+                state.currentProject?.name || "은행 코어 스키마",
+                `${tables.length}개 테이블, ${columns}개 컬럼, ${statValue("nodes")}개 노드, ${statValue("edges")}개 관계`,
+                `<button class="btn primary" data-action="sample">샘플 다시 실행</button>`
+            ) + `
+                <div class="workspace">
+                    <section class="panel">
+                        <div class="panel-head">📊 ERD 스키마</div>
+                        <div class="panel-body">${tableList}</div>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-head">🕸️ 그래프 시각화</div>
+                        <div class="panel-body">
+                            <p class="graph-help">노드를 드래그해서 보기 좋은 위치로 옮길 수 있습니다.</p>
+                            ${renderGraph()}
+                        </div>
+                    </section>
+                </div>
+            `;
+        }
+
+        function renderGraph() {
+            const semantic = state.semantic || demoSemantic;
+            const nodes = semantic.nodes || [];
+            const edges = semantic.edges || [];
+            const radius = 150;
+            const centerX = 400;
+            const centerY = 225;
+            const positions = new Map();
+
+            nodes.forEach((node, index) => {
+                const angle = (Math.PI * 2 * index) / Math.max(nodes.length, 1) - Math.PI / 2;
+                const saved = state.graphPositions[node.id];
+                positions.set(node.id, saved || {
+                    x: Math.round(centerX + radius * Math.cos(angle)),
+                    y: Math.round(centerY + radius * Math.sin(angle)),
+                });
+            });
+
+            const edgeSvg = edges.map((edge, index) => {
+                const from = positions.get(edge.from_node);
+                const to = positions.get(edge.to_node);
+                if (!from || !to) return "";
+                const label = String(edge.edge_type || "").replaceAll("_", " ");
+                return `
+                    <line class="edge" data-edge-index="${index}" data-edge-from="${escapeHtml(edge.from_node)}" data-edge-to="${escapeHtml(edge.to_node)}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" marker-end="url(#arrow)" />
+                    <text class="edge-label" data-edge-label="${index}" x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 8}" text-anchor="middle">${escapeHtml(label)}</text>
+                `;
+            }).join("");
+
+            const nodeSvg = nodes.map((node) => {
+                const pos = positions.get(node.id);
+                return `
+                    <g class="graph-node" data-graph-node="${escapeHtml(node.id)}" data-x="${pos.x}" data-y="${pos.y}" transform="translate(${pos.x} ${pos.y})">
+                        <circle cx="0" cy="0" r="48" fill="#182026" stroke="#16c8a3" stroke-width="2"></circle>
+                        <text x="0" y="-4" text-anchor="middle">${escapeHtml(node.label)}</text>
+                        <text class="sub" x="0" y="14" text-anchor="middle">${node.properties?.length || 0}개 속성</text>
+                    </g>
+                `;
+            }).join("");
+
+            return `
+                <svg class="graph" viewBox="0 0 800 460" role="img" aria-label="의미 그래프">
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#57636d"></polygon>
+                        </marker>
+                    </defs>
+                    ${edgeSvg}
+                    ${nodeSvg}
+                </svg>
+            `;
+        }
+
+        function renderDomain() {
+            const domain = state.domain || {
+                name: "finance",
+                confidence: 0.87,
+                ontology_ref: "FIBO",
+                signals: {
+                    finance: {
+                        table_hits: ["customers", "accounts", "transactions", "loans", "branches"],
+                        column_hits: ["balance", "amount", "currency", "interest_rate"],
+                        score: 26,
+                    },
+                },
+                seed_mappings: { customers: "FIBO:Customer", accounts: "FIBO:Account" },
+            };
+            const primarySignals = domain.signals?.[domain.name] || {};
+            const pct = Math.round((domain.confidence || 0) * 100);
+            return pageTitle("🎯 도메인 감지 결과", "Phase 0 결과와 온톨로지 레지스트리 매칭을 확인합니다.") + `
+                <div class="grid two">
+                    <div class="card">
+                        <div class="row between">
+                            <div>
+                                <div class="card-title">${escapeHtml(domain.name)}</div>
+                                <div class="meta">온톨로지: ${escapeHtml(domain.ontology_ref || "Schema.org")}</div>
+                            </div>
+                            <div class="stat" style="min-width:120px"><strong>${pct}%</strong><span class="meta">신뢰도</span></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🌱 시드 매핑</div>
+                        <div class="stack">
+                            ${Object.entries(domain.seed_mappings || {}).map(([src, dst]) => `
+                                <div class="row between">
+                                    <span class="mono">${escapeHtml(src)}</span>
+                                    <span class="badge fibo">${escapeHtml(dst)}</span>
+                                </div>
+                            `).join("") || `<span class="muted">등록된 seed mapping이 없습니다.</span>`}
+                        </div>
+                    </div>
+                </div>
+                <div class="grid two" style="margin-top:16px">
+                    <div class="card">
+                        <div class="card-title">📋 테이블 시그널</div>
+                        <div class="chips">${(primarySignals.table_hits || []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("") || `<span class="muted">감지 없음</span>`}</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🧱 컬럼 시그널</div>
+                        <div class="chips">${(primarySignals.column_hits || []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("") || `<span class="muted">감지 없음</span>`}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderClassification() {
+            const rows = state.classification || demoTables.map((table) => ({
+                table_name: table.name,
+                classification: table.classification,
+                graph_role: table.graph_role,
+                confidence: table.confidence,
+                source: "heuristic",
+            }));
+            const counts = rows.reduce((acc, row) => {
+                acc[row.classification] = (acc[row.classification] || 0) + 1;
+                return acc;
+            }, {});
+            return pageTitle("🏷️ 테이블 분류", "Phase 1 휴리스틱 분류와 그래프 역할 할당을 확인합니다.") + `
+                <div class="grid four" style="margin-bottom:20px">
+                    ${["ENTITY", "JUNCTION", "LOOKUP", "AUDIT"].map((key) => `
+                        <div class="stat"><strong>${counts[key] || 0}</strong><span class="meta">${key}</span></div>
+                    `).join("")}
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>테이블</th><th>분류</th><th>그래프 역할</th><th>신뢰도</th><th>출처</th></tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((row) => `
+                                <tr>
+                                    <td class="mono">${escapeHtml(row.table_name)}</td>
+                                    <td><span class="badge ${escapeHtml(String(row.classification).toLowerCase())}">${escapeHtml(row.classification)}</span></td>
+                                    <td><span class="badge ${escapeHtml(String(row.graph_role).toLowerCase())}">${escapeHtml(row.graph_role)}</span></td>
+                                    <td>${Math.round((row.confidence || 0) * 100)}%</td>
+                                    <td>${escapeHtml(row.source || "heuristic")}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderSemanticIr() {
+            const semantic = state.semantic || demoSemantic;
+            const selected = semantic.nodes.find((node) => node.id === state.selectedNode) || semantic.nodes[0];
+            if (selected && !state.selectedNode) state.selectedNode = selected.id;
+            return pageTitle(
+                "🧠 의미 IR",
+                `${semantic.stats?.nodes || semantic.nodes.length}개 노드, ${semantic.stats?.edges || semantic.edges.length}개 관계, ${semantic.stats?.node_properties || 0}개 노드 속성`
+            ) + `
+                <div class="workspace">
+                    <section class="panel">
+                        <div class="panel-head">🟢 노드</div>
+                        <div class="panel-body stack">
+                            ${semantic.nodes.map((node) => `
+                                <button class="btn ${selected?.id === node.id ? "primary" : ""}" data-select-node="${escapeHtml(node.id)}">
+                                    ${escapeHtml(node.label)}
+                                </button>
+                            `).join("")}
+                            <h2 style="margin-top:12px">🔗 관계</h2>
+                            ${semantic.edges.map((edge) => `
+                                <div class="card">
+                                    <div class="mono">${escapeHtml(edge.edge_type)}</div>
+                                    <div class="meta">${escapeHtml(edge.from_node)} → ${escapeHtml(edge.to_node)} · ${escapeHtml(edge.cardinality)}</div>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-head">📋 상세</div>
+                        <div class="panel-body">
+                            ${selected ? `
+                                <div class="card-title">${escapeHtml(selected.label)}</div>
+                                <p>원천 테이블: <span class="mono">${escapeHtml(selected.source_table)}</span></p>
+                                ${selected.domain_mapping ? `<p>도메인 매핑: <span class="badge fibo">${escapeHtml(selected.domain_mapping.ontology)}</span></p>` : ""}
+                                <h2 style="margin-top:20px">속성</h2>
+                                <table>
+                                    <thead><tr><th>이름</th><th>타입</th><th>원천 컬럼</th></tr></thead>
+                                    <tbody>
+                                        ${(selected.properties || []).map((prop) => `
+                                            <tr>
+                                                <td class="mono">${escapeHtml(prop.name)}</td>
+                                                <td>${escapeHtml(prop.data_type)}</td>
+                                                <td class="mono">${escapeHtml(prop.source_column)}</td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            ` : `<p>선택된 노드가 없습니다.</p>`}
+                        </div>
+                    </section>
+                </div>
+            `;
+        }
+
+        function renderTrace() {
+            const traces = state.trace || [
+                { table_name: "customers", classification: "ENTITY", semantic_ir: "Customer (Node)", graph_element: ":Customer", transform_type: "direct" },
+                { table_name: "accounts", classification: "ENTITY", semantic_ir: "Account (Node)", graph_element: ":Account", transform_type: "direct" },
+                { table_name: "customer_branch", classification: "JUNCTION", semantic_ir: "Customer_Branch (Edge)", graph_element: "[:CUSTOMER_BRANCH]", transform_type: "junction_merge" },
+            ];
+            return pageTitle("🔎 추적 맵", "ERD 원천과 의미 IR, 그래프 요소의 추적 링크입니다.") + `
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>ERD 테이블</th><th>분류</th><th>의미 IR</th><th>그래프 요소</th><th>변환</th></tr>
+                        </thead>
+                        <tbody>
+                            ${traces.map((row) => `
+                                <tr>
+                                    <td class="mono">${escapeHtml(row.table_name)}</td>
+                                    <td><span class="badge ${escapeHtml(String(row.classification).toLowerCase())}">${escapeHtml(row.classification)}</span></td>
+                                    <td>${escapeHtml(row.semantic_ir)}</td>
+                                    <td class="mono">${escapeHtml(row.graph_element)}</td>
+                                    <td>${escapeHtml(row.transform_type)}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        async function fetchExport(format) {
+            if (!state.currentProject?.id) {
+                state.exportCode = "// 샘플 프로젝트를 먼저 실행하면 실제 내보내기 코드를 조회합니다.";
+                state.exportFormat = format;
+                render();
+                return;
+            }
+            await withBusy(async () => {
+                const result = await api(`/projects/${state.currentProject.id}/export/${format}`);
+                state.exportFormat = format;
+                state.exportCode = result.code;
+            });
+        }
+
+        function renderExport() {
+            const code = state.exportCode || `// ${state.exportFormat} 내보내기\n// 은행 샘플을 실행한 뒤 내보내기 포맷을 선택하세요.`;
+            return pageTitle("📦 내보내기", "의미 IR을 Cypher, Mermaid, RDF-OWL, JSON, YAML로 내보냅니다.") + `
+                <div class="actions" style="margin-bottom:14px">
+                    ${["cypher", "mermaid", "rdf-owl", "json", "yaml"].map((format) => `
+                        <button class="btn small ${state.exportFormat === format ? "primary" : ""}" data-export="${format}">${format}</button>
+                    `).join("")}
+                </div>
+                <pre class="code"><code>${escapeHtml(code)}</code></pre>
+            `;
+        }
+
+        function renderSettings() {
+            const available = state.slm?.available;
+            return pageTitle("⚙️ 설정", "로컬 SLM 연결 상태와 변환 옵션을 확인합니다.") + `
+                <div class="grid two">
+                    <div class="card">
+                        <div class="card-title">🧠 SLM 상태</div>
+                        <p>Ollama: <span class="badge ${available ? "" : "draft"}">${available === undefined ? "미확인" : available ? "사용 가능" : "오프라인"}</span></p>
+                        <div class="actions" style="margin-top:14px">
+                            <button class="btn primary" data-action="slm-status">연결 확인</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">⚙️ 파이프라인</div>
+                        <p>현재 로컬 UI는 DDL 파서, DB 직접 연결, 도메인 감지, 휴리스틱 분류, 의미 IR 변환 API와 연결되어 있습니다.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNotFound() {
+            return pageTitle("페이지를 찾을 수 없습니다", "왼쪽 메뉴에서 다시 선택하세요.");
+        }
+
+        function render() {
+            state.route = getRoute();
+            const pages = {
+                "/": renderDashboard,
+                "/datasource": renderDataSource,
+                "/workspace": renderWorkspace,
+                "/domain": renderDomain,
+                "/classification": renderClassification,
+                "/semantic-ir": renderSemanticIr,
+                "/trace": renderTrace,
+                "/export": renderExport,
+                "/settings": renderSettings,
+            };
+            const page = pages[state.route] || renderNotFound;
+            app.innerHTML = layout(page());
+            bindEvents();
+        }
+
+        function bindEvents() {
+            document.querySelectorAll("[data-action='sample']").forEach((button) => {
+                button.addEventListener("click", createBankingSample);
+            });
+
+            document.querySelectorAll("[data-action='upload']").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const file = document.getElementById("ddl-file")?.files?.[0];
+                    if (!file) {
+                        state.message = "업로드할 DDL 파일을 먼저 선택하세요.";
+                        render();
+                        return;
+                    }
+                    uploadDdl(file);
+                });
+            });
+
+            document.querySelectorAll("[data-action='connect-db']").forEach((button) => {
+                button.addEventListener("click", connectDatabase);
+            });
+
+            document.querySelectorAll("[data-open-project]").forEach((card) => {
+                card.addEventListener("click", () => {
+                    const id = card.getAttribute("data-open-project");
+                    const project = state.projects.find((item) => item.id === id);
+                    if (!project || project.status !== "converted") {
+                        state.message = "변환 완료된 프로젝트만 열 수 있습니다.";
+                        render();
+                        return;
+                    }
+                    state.currentProject = project;
+                    withBusy(async () => {
+                        await loadProject(id);
+                        location.hash = "#/workspace";
+                    });
+                });
+            });
+
+            document.querySelectorAll("[data-nav]").forEach((item) => {
+                item.addEventListener("click", () => {
+                    location.hash = "#" + item.getAttribute("data-nav");
+                });
+            });
+
+            document.querySelectorAll("[data-toggle-table]").forEach((item) => {
+                item.addEventListener("click", () => {
+                    const table = item.getAttribute("data-toggle-table");
+                    state.expanded[table] = !(state.expanded[table] ?? false);
+                    render();
+                });
+            });
+
+            document.querySelectorAll("[data-select-node]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    state.selectedNode = button.getAttribute("data-select-node");
+                    render();
+                });
+            });
+
+            document.querySelectorAll("[data-export]").forEach((button) => {
+                button.addEventListener("click", () => fetchExport(button.getAttribute("data-export")));
+            });
+
+            document.querySelectorAll("[data-action='slm-status']").forEach((button) => {
+                button.addEventListener("click", () => withBusy(async () => {
+                    state.slm = await api("/slm/status");
+                }));
+            });
+
+            bindGraphDrag();
+        }
+
+        function bindGraphDrag() {
+            const svg = document.querySelector(".graph");
+            if (!svg) return;
+
+            let dragging = null;
+
+            const toSvgPoint = (event) => {
+                const point = svg.createSVGPoint();
+                point.x = event.clientX;
+                point.y = event.clientY;
+                return point.matrixTransform(svg.getScreenCTM().inverse());
+            };
+
+            const getPosition = (id) => {
+                const node = svg.querySelector(`[data-graph-node="${escapeSelector(id)}"]`);
+                const saved = state.graphPositions[id];
+                return saved || {
+                    x: Number(node?.dataset.x || 0),
+                    y: Number(node?.dataset.y || 0),
+                };
+            };
+
+            const updateEdges = () => {
+                svg.querySelectorAll("[data-edge-index]").forEach((line) => {
+                    const from = getPosition(line.dataset.edgeFrom);
+                    const to = getPosition(line.dataset.edgeTo);
+                    line.setAttribute("x1", from.x);
+                    line.setAttribute("y1", from.y);
+                    line.setAttribute("x2", to.x);
+                    line.setAttribute("y2", to.y);
+
+                    const label = svg.querySelector(`[data-edge-label="${line.dataset.edgeIndex}"]`);
+                    if (label) {
+                        label.setAttribute("x", (from.x + to.x) / 2);
+                        label.setAttribute("y", (from.y + to.y) / 2 - 8);
+                    }
+                });
+            };
+
+            svg.querySelectorAll("[data-graph-node]").forEach((node) => {
+                node.addEventListener("pointerdown", (event) => {
+                    const id = node.dataset.graphNode;
+                    const point = toSvgPoint(event);
+                    const current = getPosition(id);
+                    dragging = {
+                        id,
+                        offsetX: point.x - current.x,
+                        offsetY: point.y - current.y,
+                    };
+                    svg.setPointerCapture(event.pointerId);
+                    event.preventDefault();
+                });
+            });
+
+            svg.addEventListener("pointermove", (event) => {
+                if (!dragging) return;
+                const point = toSvgPoint(event);
+                const x = Math.max(54, Math.min(746, point.x - dragging.offsetX));
+                const y = Math.max(54, Math.min(406, point.y - dragging.offsetY));
+                state.graphPositions[dragging.id] = { x, y };
+
+                const node = svg.querySelector(`[data-graph-node="${escapeSelector(dragging.id)}"]`);
+                if (node) {
+                    node.dataset.x = x;
+                    node.dataset.y = y;
+                    node.setAttribute("transform", `translate(${x} ${y})`);
+                }
+                updateEdges();
+            });
+
+            const finishDrag = (event) => {
+                if (!dragging) return;
+                dragging = null;
+                if (svg.hasPointerCapture(event.pointerId)) {
+                    svg.releasePointerCapture(event.pointerId);
+                }
+            };
+
+            svg.addEventListener("pointerup", finishDrag);
+            svg.addEventListener("pointercancel", finishDrag);
+        }
+
+        window.addEventListener("hashchange", render);
+
+        refreshProjects().then(render);
+    </script>
+</body>
+</html>
